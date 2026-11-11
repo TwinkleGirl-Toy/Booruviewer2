@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Поиск - JoyReactor</title>
+</head>
+<body>
+  <div id="content">
+    <div class="search_results_tags">
+      <a href="/tag/Warhammer+40000">Warhammer 40000</a>
+      <a href="/tag/%D0%9A%D0%BE%D0%BC%D0%B8%D0%BA%D1%81%D1%8B">Комиксы</a>
+    </div>
+
+    <div id="post_list">
+      <!-- Post with embedded iframe media and unescaped control characters in JSON-LD -->
+      <div class="postContainer" id="postContainer6001001">
+        <div class="article post-normal">
+          <div class="uhead">
+            <div class="uhead_nick">
+              <a href="/user/EmperorGuard">EmperorGuard</a>
+            </div>
+          </div>
+          <div class="post_content" id="post_content_6001001">
+            <div class="image">
+              <iframe width="640" height="360" src="//www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+            </div>
+          </div>
+          <div class="ufoot">
+            <span class="post_rating" id="post_rating_6001001">-4.5</span>
+            <a href="/post/6001001" class="link">ссылка</a>
+          </div>
+          <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Article",
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": "https://joyreactor.cc/post/6001001"
+            },
+            "headline": "Warhammer Video / Warhammer 40000 :: Комиксы",
+            "description": "Описание с спецсимволами",
+            "datePublished": "2025-01-20T10:00:00Z",
+            "author": {
+              "@type": "Person",
+              "name": "EmperorGuard"
+            }
+          }
+          </script>
+        </div>
+      </div>
+
+      <!-- Duplicate of post 6001001 to verify parser deduplication -->
+      <div class="postContainer" id="postContainer6001001">
+        <div class="article post-normal">
+          <div class="post_content">
+            <div class="image">
+              <img src="https://img2.joyreactor.cc/pics/post/dup-1.jpeg" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text-only post without media (should be skipped cleanly) -->
+      <div class="postContainer" id="postContainer6001002">
+        <div class="article post-normal">
+          <div class="post_content">
+            <p>Просто текстовый пост без картинок и видео.</p>
+          </div>
+          <div class="ufoot">
+            <a href="/post/6001002" class="link">ссылка</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination without explicit a.next class, relying on sibling after span.current -->
+    <div class="pagination">
+      <div class="pagination_expanded">
+        <span class="current">10</span>
+        <a href="/search?q=Warhammer+40000&amp;page=9">9</a>
+        <a href="/search?q=Warhammer+40000&amp;page=8">8</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -302,3 +302,15 @@
     protocol: https_2
     sites:
       - https://nozomi.la/
+# Add this entry to the end of packages/booru_clients/boorus.yaml:
+- joyreactor:
+    metadata:
+      id: 36
+      name: joyreactor
+      display-name: JoyReactor
+    protocol: https_2
+    sites:
+      - https://joyreactor.cc/
+      - https://joyreactor.com/
+      - https://reactor.cc/
+      - https://safereactor.cc/
