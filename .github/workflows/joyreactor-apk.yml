@@ -65,29 +65,38 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat \
-            .github/joyreactor-integration.tar.xz.b64 \
-            .github/joyreactor-integration.part02.b64 \
-            .github/joyreactor-integration.part03.b64 \
-            .github/joyreactor-integration.part04.b64 \
-            .github/joyreactor-integration.part05.b64 \
-            .github/joyreactor-integration.part06.b64 \
-            .github/joyreactor-integration.part07.b64 \
-            .github/joyreactor-integration.part08.b64 \
-            .github/jr09a.b64 .github/jr09b.b64 \
-            .github/jr10a.b64 .github/jr10b.b64 \
-            .github/jr11a.b64 .github/jr11b.b64 \
-            .github/jr12a.b64 .github/jr12b.b64 \
-            .github/jr13tail.b64 > /tmp/joyreactor-integration.tar.xz.b64
-          base64 --decode /tmp/joyreactor-integration.tar.xz.b64 > /tmp/joyreactor-integration.tar.xz
-          xz --test /tmp/joyreactor-integration.tar.xz
-          tar -tJf /tmp/joyreactor-integration.tar.xz
-          tar -xJf /tmp/joyreactor-integration.tar.xz -C .
+
+          archive=".github/joyreactor-integration.tar.xz.b64"
+          if [[ -f "$archive" ]]; then
+            cat \
+              "$archive" \
+              .github/joyreactor-integration.part02.b64 \
+              .github/joyreactor-integration.part03.b64 \
+              .github/joyreactor-integration.part04.b64 \
+              .github/joyreactor-integration.part05.b64 \
+              .github/joyreactor-integration.part06.b64 \
+              .github/joyreactor-integration.part07.b64 \
+              .github/joyreactor-integration.part08.b64 \
+              .github/jr09a.b64 .github/jr09b.b64 \
+              .github/jr10a.b64 .github/jr10b.b64 \
+              .github/jr11a.b64 .github/jr11b.b64 \
+              .github/jr12a.b64 .github/jr12b.b64 \
+              .github/jr13tail.b64 > /tmp/joyreactor-integration.tar.xz.b64
+            base64 --decode /tmp/joyreactor-integration.tar.xz.b64 > /tmp/joyreactor-integration.tar.xz
+            xz --test /tmp/joyreactor-integration.tar.xz
+            tar -tJf /tmp/joyreactor-integration.tar.xz
+            tar -xJf /tmp/joyreactor-integration.tar.xz -C .
+          fi
 
           if ! grep -qE '^[[:space:]]*- joyreactor:' packages/booru_clients/boorus.yaml; then
+            if [[ ! -f packages/booru_clients/boorus.yaml.patch ]]; then
+              echo "JoyReactor YAML is not registered and its patch is missing." >&2
+              exit 1
+            fi
             cat packages/booru_clients/boorus.yaml.patch >> packages/booru_clients/boorus.yaml
           fi
           rm -f packages/booru_clients/boorus.yaml.patch
+
           python3 - <<'PY'
           from pathlib import Path
           path = Path("android/app/build.gradle.kts")
@@ -116,8 +125,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add lib/boorus/joyreactor packages/booru_clients android/app/build.gradle.kts .github
-          git commit -m "feat(booru): integrate JoyReactor in Booruviewer2"
-          git push origin HEAD:feature/joyreactor-integration
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(booru): integrate JoyReactor in Booruviewer2"
+            git push origin HEAD:feature/joyreactor-integration
+          else
+            echo "JoyReactor integration is already committed; nothing to push."
+          fi
 
       - name: Initialize workspace and generate code
         run: ./init.sh
