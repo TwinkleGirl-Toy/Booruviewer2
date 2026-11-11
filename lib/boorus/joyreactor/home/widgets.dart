@@ -6,10 +6,11 @@ import 'package:booru_clients/joyreactor.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Project imports:
-import '../../../core/configs/ref.dart';
+import '../../../core/configs/config/providers.dart';
 import '../../../core/home/widgets.dart';
 import '../../../core/posts/listing/widgets.dart';
 import '../posts/providers.dart';
+import '../posts/types.dart';
 
 final joyreactorSelectedFeedProvider =
     StateProvider.autoDispose<JoyreactorFeed>((ref) => JoyreactorFeed.good);
