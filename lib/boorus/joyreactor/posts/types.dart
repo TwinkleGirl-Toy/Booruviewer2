@@ -18,6 +18,7 @@ class JoyreactorPost extends SimplePost with EquatableMixin {
     required super.hasComment,
     required super.isTranslated,
     required super.hasParentOrChildren,
+    super.parentId,
     required super.source,
     required super.score,
     required super.duration,
