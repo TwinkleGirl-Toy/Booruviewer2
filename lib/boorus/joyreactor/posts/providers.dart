@@ -7,7 +7,6 @@ import '../../../core/posts/post/providers.dart';
 import '../../../core/posts/post/types.dart';
 import '../../../core/settings/providers.dart';
 import '../../../core/search/queries/providers.dart';
-import '../../../foundation/riverpod/riverpod.dart';
 import '../client_provider.dart';
 import 'parser.dart';
 import 'types.dart';
@@ -22,7 +21,7 @@ final joyreactorPostRepoProvider =
       getSettings: () async => ref.read(imageListingSettingsProvider),
       fetchSingle: (id, {options}) async {
         final numericId = id as NumericPostId?;
-        if (numericId == null) return Future.value(null);
+        if (numericId == null) return null;
 
         final dto = await client.getPost(id: numericId.value);
         if (dto == null) return null;
