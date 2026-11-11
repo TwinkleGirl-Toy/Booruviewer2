@@ -840,9 +840,9 @@ class JoyreactorHtmlParser {
       return unescaped;
     }
     if (unescaped.startsWith('/')) {
-      return '${baseUri.scheme}://${baseUri.AuthorityOrHost}$unescaped';
+      return '${baseUri.scheme}://${baseUri.authorityOrHost}$unescaped';
     }
-    return '${baseUri.scheme}://${baseUri.AuthorityOrHost}/$unescaped';
+    return '${baseUri.scheme}://${baseUri.authorityOrHost}/$unescaped';
   }
 
   /// Converts a JoyReactor sample image URL (`/pics/post/foo-123.jpeg`)
@@ -912,5 +912,5 @@ class JoyreactorHtmlParser {
 }
 
 extension _UriAuthorityX on Uri {
-  String get AuthorityOrHost => hasAuthority ? authority : host;
+  String get authorityOrHost => hasAuthority ? authority : host;
 }
