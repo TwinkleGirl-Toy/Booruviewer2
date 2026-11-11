@@ -109,7 +109,7 @@ jobs:
             packages/booru_clients/test/joyreactor \
             packages/booru_clients/test/pawchive \
             android/app/build.gradle.kts
-          git add -u -- ci
+          git add -u
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
