@@ -754,9 +754,11 @@ class JoyreactorHtmlParser {
     String? nextPageUrl,
     String? prevPageUrl,
   }) _parsePagination(dom.Document document) {
-    final paginationRoot = document.querySelector(
-      '.pagination_expanded, .pagination',
-    );
+    // Prefer the expanded pagination container over its outer wrapper.
+    // A selector union returns the outer wrapper first because it appears earlier.
+    final paginationRoot =
+        document.querySelector('.pagination_expanded') ??
+        document.querySelector('.pagination');
     if (paginationRoot == null) {
       return (
         currentPageNumber: null,
