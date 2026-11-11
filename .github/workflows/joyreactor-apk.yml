@@ -126,11 +126,14 @@ jobs:
         working-directory: packages/boorusama_cli
         run: dart run boorusama_cli:boorusama setup android-sdk --ci
 
-      - name: Format, analyze, and test
-        run: |
-          dart format packages/booru_clients/lib/ packages/booru_clients/test/joyreactor/ lib/boorus/joyreactor/
-          flutter analyze
-          flutter test packages/booru_clients/test/joyreactor/joyreactor_parser_test.dart
+      - name: Format JoyReactor source
+        run: dart format packages/booru_clients/lib/ packages/booru_clients/test/joyreactor/ lib/boorus/joyreactor/
+
+      - name: Analyze Flutter project
+        run: flutter analyze
+
+      - name: Run JoyReactor parser tests
+        run: flutter test packages/booru_clients/test/joyreactor/joyreactor_parser_test.dart
 
       - name: Build co-installable BooruViewer2 JoyReactor APK
         run: ./build.sh release github build apk --ci --allow-dirty --output-dir release-artifacts/joyreactor-apk
