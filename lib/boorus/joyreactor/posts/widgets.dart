@@ -46,7 +46,7 @@ class JoyreactorPostMetadataSection extends ConsumerWidget {
     final post = InheritedPost.maybeOf<JoyreactorPost>(context);
     if (post == null) return const SizedBox.shrink();
 
-    final currentPost = post.post;
+    final currentPost = post;
     final theme = Theme.of(context);
 
     return Padding(
