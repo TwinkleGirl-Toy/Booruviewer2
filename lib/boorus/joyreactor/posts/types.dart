@@ -1,10 +1,7 @@
-// Package imports:
-import 'package:equatable/equatable.dart';
-
 // Project imports:
 import '../../../core/posts/post/types.dart';
 
-class JoyreactorPost extends SimplePost with EquatableMixin {
+class JoyreactorPost extends SimplePost {
   JoyreactorPost({
     required super.id,
     required this.parentPostId,
