@@ -1,0 +1,89 @@
+{
+  "count": 3,
+  "true_count": 120,
+  "posts": [
+    {
+      "id": "27557901",
+      "user": "568551",
+      "service": "patreon",
+      "title": "Zelda Sketch",
+      "content": "<p>Whipped this one up this morning to celebrate the announcement of Breath of the Wild 2.</p>",
+      "published": "2019-06-11T18:24:46",
+      "added": "2026-06-10T22:00:00",
+      "edited": "2019-06-11T18:24:46",
+      "has_full": true,
+      "preview_state": "scraped",
+      "tags": ["zelda", "sketch", "breath of the wild"],
+      "user_profile": {
+        "id": "568551",
+        "name": "Reinbach",
+        "public_id": "Reinbach",
+        "service": "patreon",
+        "ever_imported": true
+      },
+      "file": {
+        "name": "Fuck_Yeah_Zelda_2_copy.jpg",
+        "path": "/136/e8/36e8bad834ed5b7bcadfbde9d4448535494a8f92e9a62ff1367f324ef02e5d75.jpg",
+        "server": "https://n2.pawchive.pw"
+      },
+      "attachments": [
+        {
+          "name": "Fuck_Yeah_Zelda_2_copy.jpg",
+          "path": "/136/e8/36e8bad834ed5b7bcadfbde9d4448535494a8f92e9a62ff1367f324ef02e5d75.jpg",
+          "server": "https://n2.pawchive.pw"
+        },
+        {
+          "name": "Zelda_Alt_Variant.png",
+          "path": "/13/10/13106763094e0401150fb97c74a8bb729c8bed677f562b7e82db148a92440047.png",
+          "server": "https://file.pawchive.pw"
+        },
+        {
+          "name": "Zelda_PSD_Bundle.zip",
+          "path": "/d3/51/d351dd7ab805c8e6fb135cba6edcfb50c5c767ac0ac19ba9da3632182c49316e.zip"
+        }
+      ]
+    },
+    {
+      "id": "10196562",
+      "user": "112804360",
+      "service": "fanbox",
+      "title": "Preview Only Illustration",
+      "content": "<p>Unarchived full file, preview available on img.pawchive.pw</p>",
+      "published": "2026-08-15T12:00:00",
+      "has_full": false,
+      "preview_state": "preview_only",
+      "tags": ["original", "illustration"],
+      "file": {
+        "name": "fanbox_cover.png",
+        "path": "/ab/cd/abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789.png",
+        "preview_only": true
+      },
+      "attachments": [
+        {
+          "name": "signed_deferred_image.png",
+          "path": "/ef/01/ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd.png",
+          "temp_url": "https://t1.pawchive.pw/f/ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd.png?e=1790000000&s=sig123",
+          "preview_only": true
+        },
+        {
+          "name": "empty_deferred.png",
+          "deferred": true
+        }
+      ]
+    },
+    {
+      "id": "168053533",
+      "user": "2463813",
+      "service": "patreon",
+      "title": "Animation Loop MP4",
+      "content": "",
+      "published": "2026-08-29T09:30:00Z",
+      "has_full": true,
+      "file": {
+        "name": "loop_animation.mp4",
+        "path": "/d4/53/d4533ccd43fb0b6c037ec4a0ead757b8b5a93657a097856dbb8dfc56c8b7b797.mp4"
+      },
+      "attachments": []
+    }
+  ]
+}

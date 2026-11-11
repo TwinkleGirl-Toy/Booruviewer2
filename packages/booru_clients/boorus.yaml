@@ -302,3 +302,29 @@
     protocol: https_2
     sites:
       - https://nozomi.la/
+
+- joyreactor:
+    metadata:
+      id: 36
+      name: joyreactor
+      display-name: JoyReactor
+    protocol: https_2
+    headers:
+      - Referer: https://joyreactor.cc/
+    sites:
+      - https://joyreactor.cc/
+      - https://joyreactor.com/
+      - https://reactor.cc/
+      - https://safereactor.cc/
+
+- pawchive:
+    metadata:
+      id: 37
+      name: pawchive
+      display-name: Pawchive
+    protocol: https_2
+    headers:
+      - Referer: https://pawchive.pw/
+    sites:
+      - https://pawchive.pw/
+      - https://pawchive.st/
