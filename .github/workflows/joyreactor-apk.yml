@@ -1,0 +1,144 @@
+name: JoyReactor APK
+
+on:
+  push:
+    branches:
+      - feature/joyreactor-integration
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: joyreactor-apk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      BOORUSAMA_USE_FVM: "false"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: .fvmrc
+          cache: true
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Free runner disk space
+        run: |
+          set -euo pipefail
+          df -h /
+          sudo rm -rf \
+            /usr/share/dotnet \
+            /usr/local/share/powershell \
+            /usr/local/lib/android/sdk/system-images \
+            /usr/local/lib/android/sdk/emulator \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/local/share/chromium \
+            /usr/local/share/chrome
+          sudo apt-get clean
+          df -h /
+          available_kb=$(df --output=avail / | tail -n 1 | tr -d ' ')
+          if [[ "$available_kb" -lt 10485760 ]]; then
+            echo "Less than 10 GiB free; refusing to start an unreliable Android build."
+            exit 1
+          fi
+
+      - name: Install native build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build nasm xz-utils
+
+      - name: Apply JoyReactor integration and commit source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat \
+            .github/joyreactor-integration.tar.xz.b64 \
+            .github/joyreactor-integration.part02.b64 \
+            .github/joyreactor-integration.part03.b64 \
+            .github/joyreactor-integration.part04.b64 \
+            .github/joyreactor-integration.part05.b64 \
+            .github/joyreactor-integration.part06.b64 \
+            .github/joyreactor-integration.part07.b64 \
+            .github/joyreactor-integration.part08.b64 \
+            .github/jr09a.b64 .github/jr09b.b64 \
+            .github/jr10a.b64 .github/jr10b.b64 \
+            .github/jr11a.b64 .github/jr11b.b64 \
+            .github/jr12a.b64 .github/jr12b.b64 \
+            .github/jr13tail.b64 > /tmp/joyreactor-integration.tar.xz.b64
+          base64 --decode /tmp/joyreactor-integration.tar.xz.b64 > /tmp/joyreactor-integration.tar.xz
+          xz --test /tmp/joyreactor-integration.tar.xz
+          tar -tJf /tmp/joyreactor-integration.tar.xz
+          tar -xJf /tmp/joyreactor-integration.tar.xz -C .
+
+          if ! grep -qE '^[[:space:]]*- joyreactor:' packages/booru_clients/boorus.yaml; then
+            cat packages/booru_clients/boorus.yaml.patch >> packages/booru_clients/boorus.yaml
+          fi
+          rm -f packages/booru_clients/boorus.yaml.patch
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("android/app/build.gradle.kts")
+          source = path.read_text()
+          old = 'applicationId = "com.degenk.boorusama"'
+          new = 'applicationId = "com.degenk.boorusama.joyreactor"'
+          if new not in source:
+              if old not in source:
+                  raise SystemExit("Could not find the existing Android applicationId.")
+              source = source.replace(old, new, 1)
+          source = source.replace(
+              'resValue("string", "app_name", "Boorusama Dev")',
+              'resValue("string", "app_name", "BooruViewer2 Dev")',
+          )
+          source = source.replace(
+              'resValue("string", "app_name", "Boorusama")',
+              'resValue("string", "app_name", "BooruViewer2")',
+          )
+          path.write_text(source)
+          PY
+
+          rm -f \
+            .github/joyreactor-integration.tar.xz.b64 \
+            .github/joyreactor-integration.part*.b64 \
+            .github/jr*.b64
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/boorus/joyreactor packages/booru_clients android/app/build.gradle.kts .github
+          git commit -m "feat(booru): integrate JoyReactor in Booruviewer2"
+          git push origin HEAD:feature/joyreactor-integration
+
+      - name: Initialize workspace and generate code
+        run: ./init.sh
+
+      - name: Install configured Android SDK packages
+        working-directory: packages/boorusama_cli
+        run: dart run boorusama_cli:boorusama setup android-sdk --ci
+
+      - name: Format, analyze, and test
+        run: |
+          dart format packages/booru_clients/lib/ packages/booru_clients/test/joyreactor/ lib/boorus/joyreactor/
+          flutter analyze
+          flutter test packages/booru_clients/test/joyreactor/joyreactor_parser_test.dart
+
+      - name: Build co-installable BooruViewer2 JoyReactor APK
+        run: ./build.sh release github build apk --ci --allow-dirty --output-dir release-artifacts/joyreactor-apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: booruviewer2-joyreactor-apk
+          path: release-artifacts/joyreactor-apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
