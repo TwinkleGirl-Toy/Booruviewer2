@@ -1,0 +1,87 @@
+name: JoyReactor APK
+
+on:
+  push:
+    branches:
+      - feature/joyreactor-integration
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: joyreactor-apk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: .fvmrc
+          cache: true
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Install native build tools
+        run: sudo apt-get update && sudo apt-get install -y meson ninja-build nasm
+
+      - name: Apply JoyReactor integration and commit source
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=.github/joyreactor-integration.zip.b64
+          if [[ -f "$archive" ]]; then
+            base64 --decode "$archive" > /tmp/joyreactor-integration.zip
+            unzip -o /tmp/joyreactor-integration.zip -d .
+            sed -i 's/id: 35/id: 36/' packages/booru_clients/boorus.yaml.patch
+            cat packages/booru_clients/boorus.yaml.patch >> packages/booru_clients/boorus.yaml
+            rm packages/booru_clients/boorus.yaml.patch "$archive"
+            python3 - <<'PY'
+          from pathlib import Path
+          p = Path('android/app/build.gradle.kts')
+          s = p.read_text()
+          s = s.replace('applicationId = "com.degenk.boorusama"', 'applicationId = "com.degenk.boorusama.joyreactor"')
+          s = s.replace('resValue("string", "app_name", "Boorusama Dev")', 'resValue("string", "app_name", "BooruViewer2 Dev")')
+          s = s.replace('resValue("string", "app_name", "Boorusama")', 'resValue("string", "app_name", "BooruViewer2")')
+          p.write_text(s)
+          PY
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "feat: integrate native JoyReactor source"
+            git push
+          fi
+
+      - name: Initialize workspace and generate code
+        run: ./init.sh
+
+      - name: Format and analyze
+        run: |
+          dart format packages/booru_clients/lib/ lib/boorus/joyreactor/
+          flutter analyze
+
+      - name: Run JoyReactor parser tests
+        run: flutter test packages/booru_clients/test/joyreactor/joyreactor_parser_test.dart
+
+      - name: Build co-installable BooruViewer2 APK
+        run: ./build.sh release github build apk --ci --allow-dirty --output-dir release-artifacts/joyreactor-apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: booruviewer2-joyreactor-apk
+          path: release-artifacts/joyreactor-apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
