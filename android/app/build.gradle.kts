@@ -47,7 +47,7 @@ extensions.configure<ApplicationExtension> {
     }
 
     defaultConfig {
-        applicationId = "com.degenk.boorusama"
+        applicationId = "com.degenk.boorusama.joyreactor"
         minSdk = minSdkVersion
         targetSdk = targetSdkVersion
         versionCode = flutter.versionCode
@@ -83,14 +83,14 @@ extensions.configure<ApplicationExtension> {
     productFlavors {
         create("dev") {
             dimension = "boorusama"
-            resValue("string", "app_name", "Boorusama Dev")
+            resValue("string", "app_name", "BooruViewer2 Dev")
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
         }
 
         create("prod") {
             dimension = "boorusama"
-            resValue("string", "app_name", "Boorusama")
+            resValue("string", "app_name", "BooruViewer2")
         }
     }
 }
