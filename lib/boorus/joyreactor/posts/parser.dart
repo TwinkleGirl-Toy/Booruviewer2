@@ -13,14 +13,12 @@ List<JoyreactorPost> postDtoToPosts(
   PostMetadata? metadata,
 ) {
   final postId = dto.id;
-  if (postId == null) return const [];
-
-  final attachments = dto.attachments ?? const <JoyreactorMediaAttachmentDto>[];
+  final attachments = dto.media;
   if (attachments.isEmpty) return const [];
 
   final tags = <String>{
-    for (final t in dto.tags ?? const <String>[])
-      if (t.trim().isNotEmpty) t.trim().replaceAll(' ', '_'),
+    for (final t in dto.tags)
+      if (t.normalizedName.trim().isNotEmpty) t.normalizedName,
   };
 
   final score = (dto.score ?? 0).round();
@@ -35,7 +33,7 @@ List<JoyreactorPost> postDtoToPosts(
   for (var i = 0; i < total; i++) {
     final attachment = attachments[i];
     final thumbUrl = attachment.thumbnailUrl ?? '';
-    final fullUrl = attachment.fullImageUrl ?? thumbUrl;
+    final fullUrl = attachment.originalUrl;
     final videoUrl =
         attachment.videoUrl ?? (attachment.isVideo ? fullUrl : '');
     final isVideo = attachment.isVideo && videoUrl.isNotEmpty;
@@ -77,7 +75,7 @@ List<JoyreactorPost> postDtoToPosts(
         uploaderName: dto.authorName,
         createdAt: dto.createdAt,
         metadata: metadata,
-        authorId: dto.authorId,
+        authorId: dto.authorId?.toString(),
         postUrl: postUrl,
         isGif: attachment.isGif,
         title: dto.title,
