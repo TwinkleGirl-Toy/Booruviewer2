@@ -12,8 +12,8 @@ import '../client_provider.dart';
 import 'parser.dart';
 import 'types.dart';
 
-final pawchiveSortTypeProvider = StateProvider<PawchiveSortType>(
-  (ref) => PawchiveSortType.popular,
+final pawchiveSortTypeProvider = StateProvider<PawchiveFeed>(
+  (ref) => PawchiveFeed.popularDay,
 );
 
 final pawchiveSeenPostIdsProvider =
@@ -44,7 +44,7 @@ final pawchivePostRepoProvider =
 final pawchivePostRepoWithSortProvider =
     Provider.family<
       PostRepository<PawchivePost>,
-      ({BooruConfigSearch config, PawchiveSortType sort})
+      ({BooruConfigSearch config, PawchiveFeed sort})
     >((ref, params) {
       return _createPawchivePostRepository(
         ref: ref,
@@ -56,7 +56,7 @@ final pawchivePostRepoWithSortProvider =
 PostRepository<PawchivePost> _createPawchivePostRepository({
   required Ref ref,
   required BooruConfigSearch config,
-  required PawchiveSortType sort,
+  required PawchiveFeed sort,
 }) {
   final client = ref.watch(pawchiveClientProvider(config.auth));
   final tagComposer = ref.watch(defaultTagQueryComposerProvider(config));
@@ -72,9 +72,9 @@ PostRepository<PawchivePost> _createPawchivePostRepository({
       final target = lookup[numericId.value];
       if (target == null) return null;
 
-      final dto = await client.getPost(
+      final dto = await client.getPostDetails(
         service: target.service,
-        creatorId: target.creatorId,
+        userId: target.creatorId,
         postId: target.postId,
       );
       if (dto == null) return null;
@@ -93,20 +93,20 @@ PostRepository<PawchivePost> _createPawchivePostRepository({
       for (final rawTag in tags) {
         final lower = rawTag.toLowerCase();
         if (lower == 'sort:popular' || lower == 'order:popular') {
-          effectiveSort = PawchiveSortType.popular;
+          effectiveSort = PawchiveFeed.popularDay;
         } else if (lower == 'sort:recent' ||
             lower == 'sort:new' ||
             lower == 'order:date') {
-          effectiveSort = PawchiveSortType.recent;
+          effectiveSort = PawchiveFeed.recent;
         } else {
           effectiveTags.add(rawTag);
         }
       }
 
-      final pageDto = await client.getPosts(
+      final pageDto = await client.getPage(
         tags: effectiveTags,
         page: page,
-        sort: effectiveSort,
+        defaultFeed: effectiveSort,
       );
 
       final metadata = PostMetadata(
@@ -137,7 +137,7 @@ PostRepository<PawchivePost> _createPawchivePostRepository({
         }
       }
 
-      return expandedPosts.toResult(total: pageDto.totalCount);
+      return expandedPosts.toResult(total: pageDto.trueCount ?? pageDto.count);
     },
     getSettings: () async => ref.read(imageListingSettingsProvider),
   );
