@@ -23,7 +23,6 @@ if (keystorePropertiesFile.exists()) {
 val hasValidKeystore = keystorePropertiesFile.exists() && 
     keystoreProperties["storeFile"] != null && 
     file(keystoreProperties["storeFile"] as String).exists()
-val splitPerAbi = project.findProperty("split-per-abi") == "true"
 val compileSdkVersion = providers.gradleProperty("boorusama.android.compileSdk").get().toInt()
 val targetSdkVersion = providers.gradleProperty("boorusama.android.targetSdk").get().toInt()
 val minSdkVersion = providers.gradleProperty("boorusama.android.minSdk").get().toInt()
@@ -71,9 +70,7 @@ extensions.configure<ApplicationExtension> {
             signingConfig = if (hasValidKeystore) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
-                if (!splitPerAbi) {
-                    abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64"))
-                }
+                abiFilters.add("arm64-v8a")
             }
         }
     }
