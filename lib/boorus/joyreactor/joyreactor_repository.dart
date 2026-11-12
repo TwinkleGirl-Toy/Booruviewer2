@@ -55,7 +55,7 @@ class JoyreactorRepository extends BooruRepositoryDefault {
   @override
   Map<String, String> extraHttpHeaders(BooruConfigAuth config) {
     final baseUrl = JoyreactorClient.normalizeBaseUrl(config.url);
-    final referer = baseUrl.endsWith('/') ? baseUrl : '${baseUrl}/';
+    final referer = baseUrl.endsWith('/') ? baseUrl : '$baseUrl/';
     return {
       'Referer': referer,
     };
