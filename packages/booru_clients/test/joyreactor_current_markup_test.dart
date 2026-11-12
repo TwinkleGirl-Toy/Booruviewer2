@@ -1,5 +1,5 @@
 import 'package:booru_clients/joyreactor.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('parses current JoyReactor content markup', () {
