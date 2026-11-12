@@ -1,4 +1,5 @@
 name: JoyReactor and Pawchive CI
+# [ci-bootstrap] Rebuild verified ARM64-only release after feed parser fixes.
 
 on:
   push:
