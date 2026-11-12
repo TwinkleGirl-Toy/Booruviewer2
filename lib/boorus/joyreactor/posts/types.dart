@@ -48,6 +48,7 @@ class JoyreactorPost extends SimplePost {
 
   final String? authorId;
   final String? postUrl;
+  @override
   final bool isGif;
   final String? title;
   final int? commentCount;
