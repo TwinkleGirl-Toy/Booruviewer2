@@ -59,7 +59,7 @@ class PawchivePost extends SimplePost {
   final String? originalFilename;
 
   @override
-  String get sitePostId => rawPostId.isNotEmpty
+  String? get sitePostId => rawPostId.isNotEmpty
       ? (totalAttachments > 1
             ? '${rawPostId}_${attachmentIndex + 1}'
             : rawPostId)
