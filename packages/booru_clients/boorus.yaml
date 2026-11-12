@@ -310,10 +310,10 @@
       display-name: JoyReactor
     protocol: https_2
     headers:
-      - Referer: https://joyreactor.cc/
+      - Referer: https://joyreactor.com/
     sites:
-      - https://joyreactor.cc/
       - https://joyreactor.com/
+      - https://joyreactor.cc/
       - https://reactor.cc/
       - https://safereactor.cc/
 
