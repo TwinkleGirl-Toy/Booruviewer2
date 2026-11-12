@@ -12,14 +12,12 @@ List<PawchivePost> postDtoToPosts(
   PawchivePostDto dto,
   PostMetadata? metadata,
 ) {
-  final baseId = dto.id;
-  if (baseId == null) return const [];
-
-  final attachments = dto.attachments ?? const <PawchiveMediaAttachmentDto>[];
+  final baseId = dto.numericId;
+  final attachments = dto.files;
   if (attachments.isEmpty) return const [];
 
   final tags = <String>{
-    for (final t in dto.tags ?? const <String>[])
+    for (final t in dto.tags)
       if (t.trim().isNotEmpty) t.trim().replaceAll(' ', '_'),
   };
 
@@ -30,15 +28,14 @@ List<PawchivePost> postDtoToPosts(
 
   for (var i = 0; i < total; i++) {
     final attachment = attachments[i];
-    final thumbUrl = attachment.thumbnailUrl ?? '';
-    final fullUrl = attachment.fullImageUrl ?? thumbUrl;
-    final videoUrl =
-        attachment.videoUrl ?? (attachment.isVideo ? fullUrl : '');
+    final thumbUrl = attachment.thumbnailUrl;
+    final fullUrl = attachment.originalUrl;
+    final videoUrl = attachment.tempUrl ?? (attachment.isVideo ? fullUrl : '');
     final isVideo = attachment.isVideo && videoUrl.isNotEmpty;
 
     final format = _extractFormat(
       isVideo ? videoUrl : fullUrl,
-      fallbackFormat: attachment.format,
+      fallbackFormat: attachment.extension,
     );
 
     final syntheticId = total == 1 ? baseId : (baseId * 100 + i + 1);
@@ -46,9 +43,9 @@ List<PawchivePost> postDtoToPosts(
     results.add(
       PawchivePost(
         id: syntheticId,
-        rawPostId: dto.rawId ?? baseId.toString(),
-        service: dto.service ?? 'patreon',
-        creatorId: dto.creatorId ?? '',
+        rawPostId: dto.id,
+        service: dto.service,
+        creatorId: dto.userId,
         attachmentIndex: i,
         totalAttachments: total,
         thumbnailImageUrl: thumbUrl,
@@ -60,7 +57,7 @@ List<PawchivePost> postDtoToPosts(
         isTranslated: false,
         hasParentOrChildren: total > 1,
         source: source,
-        score: dto.attachmentCount ?? total,
+        score: total,
         duration: kNoduration,
         fileSize: 0,
         format: format,
@@ -70,14 +67,14 @@ List<PawchivePost> postDtoToPosts(
         md5: '',
         videoThumbnailUrl: isVideo ? thumbUrl : '',
         videoUrl: isVideo ? videoUrl : '',
-        uploaderId: int.tryParse(dto.creatorId ?? ''),
-        uploaderName: dto.creatorName ?? dto.creatorId,
-        createdAt: dto.createdAt,
+        uploaderId: int.tryParse(dto.userId),
+        uploaderName: dto.username,
+        createdAt: dto.publishedAt,
         metadata: metadata,
         postUrl: postUrl,
         title: dto.title,
         content: dto.content,
-        originalFilename: attachment.filename,
+        originalFilename: attachment.name,
       ),
     );
   }
