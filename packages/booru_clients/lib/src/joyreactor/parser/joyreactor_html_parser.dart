@@ -385,7 +385,7 @@ class JoyreactorHtmlParser {
       }
       final idClass = avatarImg.className;
       final idMatch = RegExp(r'user_(\d+)').firstMatch(idClass) ??
-          RegExp(r'/avatar/user/(\d+)').firstMatch(src);
+          RegExp(r'/avatar/user/(\d+)').firstMatch(src ?? '');
       if (idMatch != null) {
         userId = int.tryParse(idMatch.group(1)!);
       }
