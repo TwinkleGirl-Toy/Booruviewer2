@@ -792,18 +792,14 @@ class JoyreactorHtmlParser {
       }
     }
 
-    // 3. Fallback: if `a.next` is not present, inspect the element immediately after `span.current`
+    // 3. Fallback: some JoyReactor layouts omit `a.next` and place the older-page
+    // link directly after `span.current`. Use the adjacent-sibling selector so this
+    // also works when the pagination markup contains non-element nodes.
     if (nextPageUrl == null && currentSpan != null) {
-      final children = paginationRoot.children;
-      final currentIndex = children.indexOf(currentSpan);
-      if (currentIndex != -1 && currentIndex + 1 < children.length) {
-        final nextSibling = children[currentIndex + 1];
-        if (nextSibling.localName == 'a') {
-          final href = nextSibling.attributes['href']?.trim() ?? '';
-          if (href.isNotEmpty) {
-            nextPageUrl = normalizeUrl(href);
-          }
-        }
+      final nextSibling = paginationRoot.querySelector('span.current + a');
+      final href = nextSibling?.attributes['href']?.trim() ?? '';
+      if (href.isNotEmpty) {
+        nextPageUrl = normalizeUrl(href);
       }
     }
 
