@@ -8,8 +8,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../core/posts/details/types.dart';
 import '../../../core/posts/details_parts/types.dart';
 import '../../../core/posts/details_parts/widgets.dart';
-import '../../../core/search/search/routes.dart';
-import '../../../core/search/selected_tags/types.dart';
 import '../../../foundation/url_launcher.dart';
 import 'types.dart';
 
@@ -96,7 +94,7 @@ class JoyreactorInheritedTagsTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return DefaultInheritedBasicTagsTile<JoyreactorPost>();
+    return const DefaultInheritedBasicTagsTile<JoyreactorPost>();
   }
 }
 
