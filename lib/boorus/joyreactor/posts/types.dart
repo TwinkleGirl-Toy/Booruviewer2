@@ -30,7 +30,7 @@ class JoyreactorPost extends SimplePost {
     required super.uploaderName,
     required super.createdAt,
     required super.metadata,
-    super.commentCount,
+    this.commentCount,
     this.authorId,
     this.postUrl,
     this.isGif = false,
@@ -50,9 +50,10 @@ class JoyreactorPost extends SimplePost {
   final String? postUrl;
   final bool isGif;
   final String? title;
+  final int? commentCount;
 
   @override
-  String get sitePostId => parentPostId > 0
+  String? get sitePostId => parentPostId > 0
       ? (totalAttachments > 1
             ? '${parentPostId}_${attachmentIndex + 1}'
             : parentPostId.toString())
