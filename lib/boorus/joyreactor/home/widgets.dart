@@ -11,7 +11,6 @@ import '../../../core/home/widgets.dart';
 import '../../../core/posts/count/widgets.dart';
 import '../../../core/posts/listing/providers.dart';
 import '../../../core/posts/listing/widgets.dart';
-import '../../../core/posts/post/providers.dart';
 import '../../../core/search/search/routes.dart';
 import '../../../core/search/search/types.dart';
 import '../../../core/search/search/widgets.dart';
