@@ -48,7 +48,7 @@ final joyreactorPostRepoWithFeedProvider =
 PostRepository<JoyreactorPost> _createJoyreactorPostRepository({
   required Ref ref,
   required BooruConfigSearch config,
-  required JoyreactorFeedType feed,
+  required JoyreactorFeed feed,
 }) {
   final client = ref.watch(joyreactorClientProvider(config.auth));
   final tagComposer = ref.watch(defaultTagQueryComposerProvider(config));
@@ -77,15 +77,15 @@ PostRepository<JoyreactorPost> _createJoyreactorPostRepository({
       for (final rawTag in tags) {
         final lower = rawTag.toLowerCase();
         if (lower == 'feed:good' || lower == 'sort:good') {
-          effectiveFeed = JoyreactorFeedType.good;
+          effectiveFeed = JoyreactorFeed.good;
         } else if (lower == 'feed:best' || lower == 'sort:best') {
-          effectiveFeed = JoyreactorFeedType.best;
+          effectiveFeed = JoyreactorFeed.best;
         } else if (lower == 'feed:new' || lower == 'sort:new') {
-          effectiveFeed = JoyreactorFeedType.newPosts;
+          effectiveFeed = JoyreactorFeed.latest;
         } else if (lower == 'feed:abyss' || lower == 'abyss') {
-          effectiveFeed = JoyreactorFeedType.abyss;
+          effectiveFeed = JoyreactorFeed.abyss;
         } else if (lower == 'feed:all') {
-          effectiveFeed = JoyreactorFeedType.all;
+          effectiveFeed = JoyreactorFeed.abyss;
         } else {
           effectiveTags.add(rawTag);
         }
