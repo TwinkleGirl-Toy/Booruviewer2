@@ -8,18 +8,18 @@ import 'package:dio/dio.dart';
 import 'parser/joyreactor_html_parser.dart';
 import 'types/types.dart';
 
-const kJoyreactorDefaultUrl = 'https://joyreactor.cc';
+const kJoyreactorDefaultUrl = 'https://joyreactor.com';
 
 class JoyreactorClient {
   JoyreactorClient({
     Dio? dio,
     String? baseUrl,
     this.minRequestInterval = const Duration(milliseconds: 350),
-  })  : baseUrl = _normalizeBaseUrl(baseUrl ?? kJoyreactorDefaultUrl),
+  })  : baseUrl = normalizeBaseUrl(baseUrl ?? kJoyreactorDefaultUrl),
         _dio = dio ??
             Dio(
               BaseOptions(
-                baseUrl: _normalizeBaseUrl(baseUrl ?? kJoyreactorDefaultUrl),
+                baseUrl: normalizeBaseUrl(baseUrl ?? kJoyreactorDefaultUrl),
                 connectTimeout: const Duration(seconds: 20),
                 receiveTimeout: const Duration(seconds: 25),
                 headers: {
@@ -27,12 +27,12 @@ class JoyreactorClient {
                       'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                   'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
                   'Referer':
-                      '${_normalizeBaseUrl(baseUrl ?? kJoyreactorDefaultUrl)}/',
+                      '${normalizeBaseUrl(baseUrl ?? kJoyreactorDefaultUrl)}/',
                 },
               ),
             ),
         _parser = JoyreactorHtmlParser(
-          baseUrl: _normalizeBaseUrl(baseUrl ?? kJoyreactorDefaultUrl),
+          baseUrl: normalizeBaseUrl(baseUrl ?? kJoyreactorDefaultUrl),
         );
 
   final String baseUrl;
@@ -53,12 +53,21 @@ class JoyreactorClient {
   /// when new posts shift reverse-numbered pages during infinite scrolling.
   final Map<String, Set<int>> _seenPostIdsByQuery = {};
 
-  static String _normalizeBaseUrl(String raw) {
+  static String normalizeBaseUrl(String raw) {
     final trimmed = raw.trim();
-    if (trimmed.endsWith('/')) {
-      return trimmed.substring(0, trimmed.length - 1);
-    }
-    return trimmed;
+    final uri = Uri.tryParse(trimmed);
+    final canonical = uri != null &&
+            (uri.host.toLowerCase() == 'joyreactor.cc' ||
+                uri.host.toLowerCase() == 'www.joyreactor.cc')
+        ? uri.replace(
+            host: uri.host.toLowerCase() == 'www.joyreactor.cc'
+                ? 'www.joyreactor.com'
+                : 'joyreactor.com',
+          ).toString()
+        : trimmed;
+    return canonical.endsWith('/')
+        ? canonical.substring(0, canonical.length - 1)
+        : canonical;
   }
 
   /// Clears cached pagination links and deduplication sets (e.g. on pull-to-refresh).
