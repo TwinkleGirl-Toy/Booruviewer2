@@ -12,8 +12,8 @@ import '../client_provider.dart';
 import 'parser.dart';
 import 'types.dart';
 
-final joyreactorFeedTypeProvider = StateProvider<JoyreactorFeedType>(
-  (ref) => JoyreactorFeedType.all,
+final joyreactorFeedTypeProvider = StateProvider<JoyreactorFeed>(
+  (ref) => JoyreactorFeed.abyss,
 );
 
 final joyreactorSeenPostIdsProvider =
@@ -36,7 +36,7 @@ final joyreactorPostRepoProvider =
 final joyreactorPostRepoWithFeedProvider =
     Provider.family<
       PostRepository<JoyreactorPost>,
-      ({BooruConfigSearch config, JoyreactorFeedType feed})
+      ({BooruConfigSearch config, JoyreactorFeed feed})
     >((ref, params) {
       return _createJoyreactorPostRepository(
         ref: ref,
@@ -60,7 +60,7 @@ PostRepository<JoyreactorPost> _createJoyreactorPostRepository({
       final numericId = id as NumericPostId?;
       if (numericId == null) return Future.value();
 
-      final dto = await client.getPost(numericId.value);
+      final dto = await client.getPost(id: numericId.value);
       if (dto == null) return null;
 
       final posts = postDtoToPosts(dto, null);
@@ -91,10 +91,10 @@ PostRepository<JoyreactorPost> _createJoyreactorPostRepository({
         }
       }
 
-      final pageDto = await client.getPosts(
+      final pageDto = await client.getPage(
         tags: effectiveTags,
         page: page,
-        feed: effectiveFeed,
+        defaultFeed: effectiveFeed,
       );
 
       final metadata = PostMetadata(
