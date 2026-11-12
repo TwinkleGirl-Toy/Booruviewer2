@@ -17,13 +17,13 @@ final pawchiveAutocompleteRepoProvider =
 
           final dtos = await client.autocomplete(query: text);
           return dtos
-              .where((e) => e.value != null && e.value!.isNotEmpty)
+              .where((e) => e.name.isNotEmpty)
               .map(
                 (e) => AutocompleteData(
-                  label: e.label ?? e.value!,
-                  value: e.value!.replaceAll(' ', '_'),
+                  label: e.name,
+                  value: e.normalizedName,
                   category: e.category,
-                  postCount: e.postCount,
+                  postCount: e.count,
                 ),
               )
               .toList();
