@@ -133,8 +133,32 @@ jobs:
       - name: Analyze Flutter project
         run: flutter analyze
 
-      - name: Build co-installable production release APK
+      - name: Build co-installable ARM64-only production release APK
         run: ./build.sh release github build apk --ci --allow-dirty --output-dir release-artifacts/joyreactor-pawchive-apk
+
+      - name: Verify APK contains only arm64-v8a native libraries
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          apks = list(Path("release-artifacts/joyreactor-pawchive-apk").rglob("*.apk"))
+          if not apks:
+              raise SystemExit("No APK was produced.")
+
+          for apk in apks:
+              with ZipFile(apk) as archive:
+                  abis = {
+                      name.split("/")[1]
+                      for name in archive.namelist()
+                      if name.startswith("lib/") and len(name.split("/")) > 2
+                  }
+              if abis != {"arm64-v8a"}:
+                  raise SystemExit(f"{apk.name}: expected only arm64-v8a, found {sorted(abis)}")
+              print(f"{apk.name}: verified ARM64-only")
+
+          PY
 
       - name: Upload release APK
         uses: actions/upload-artifact@v7
