@@ -15,14 +15,14 @@ final joyreactorAutocompleteRepoProvider =
           final text = query.text.trim();
           if (text.isEmpty) return const [];
 
-          final dtos = await client.autocomplete(query: text);
+          final dtos = await client.searchTags(query: text);
           return dtos
-              .where((e) => e.tag != null && e.tag!.isNotEmpty)
+              .where((e) => e.name.isNotEmpty)
               .map(
                 (e) => AutocompleteData(
-                  label: e.label ?? e.tag!,
-                  value: e.tag!.replaceAll(' ', '_'),
-                  postCount: e.postCount,
+                  label: e.name,
+                  value: e.normalizedName,
+                  postCount: e.count,
                 ),
               )
               .toList();
