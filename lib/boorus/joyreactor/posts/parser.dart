@@ -32,11 +32,11 @@ List<JoyreactorPost> postDtoToPosts(
 
   for (var i = 0; i < total; i++) {
     final attachment = attachments[i];
-    final thumbUrl = attachment.thumbnailUrl ?? '';
+    final thumbUrl = attachment.thumbnailUrl;
     final fullUrl = attachment.originalUrl;
-    final videoUrl =
-        attachment.videoUrl ?? (attachment.isVideo ? fullUrl : '');
-    final isVideo = attachment.isVideo && videoUrl.isNotEmpty;
+    final isVideo =
+        attachment.isVideo || attachment.type == JoyreactorMediaType.embed;
+    final videoUrl = attachment.videoUrl ?? (isVideo ? fullUrl : '');
 
     final format = _extractFormat(
       isVideo ? videoUrl : fullUrl,
@@ -52,7 +52,7 @@ List<JoyreactorPost> postDtoToPosts(
         attachmentIndex: i,
         totalAttachments: total,
         thumbnailImageUrl: thumbUrl,
-        sampleImageUrl: isVideo ? thumbUrl : thumbUrl,
+        sampleImageUrl: isVideo ? thumbUrl : attachment.sampleUrl,
         originalImageUrl: isVideo ? videoUrl : fullUrl,
         tags: tags,
         rating: Rating.general,
@@ -71,7 +71,7 @@ List<JoyreactorPost> postDtoToPosts(
         md5: '',
         videoThumbnailUrl: isVideo ? thumbUrl : '',
         videoUrl: isVideo ? videoUrl : '',
-        uploaderId: null,
+        uploaderId: dto.authorId,
         uploaderName: dto.authorName,
         createdAt: dto.createdAt,
         metadata: metadata,
