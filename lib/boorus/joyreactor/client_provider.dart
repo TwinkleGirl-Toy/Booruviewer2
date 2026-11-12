@@ -16,7 +16,7 @@ final joyreactorClientProvider =
 
       return JoyreactorClient(
         dio: dio,
-        baseUrl: baseUrl,
+        baseUrl: JoyreactorClient.normalizeBaseUrl(config.url),
       );
     });
 
@@ -37,7 +37,7 @@ final joyreactorDioProvider = Provider.family<Dio, BooruConfigAuth>((
       networkProtocolInfo: ref.watch(
         defaultNetworkProtocolInfoProvider(config),
       ),
-      baseUrl: config.url,
+      baseUrl: baseUrl,
       proxySettings: config.proxySettings,
     ),
     additionalInterceptors: [
@@ -53,7 +53,7 @@ final joyreactorDioProvider = Provider.family<Dio, BooruConfigAuth>((
 
   dio.options.headers['Referer'] = baseUrl.endsWith('/')
       ? baseUrl
-      : '${baseUrl}/';
+      : '$baseUrl/';
 
   return dio;
 });
