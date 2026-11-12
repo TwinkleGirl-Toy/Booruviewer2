@@ -107,7 +107,7 @@ class PawchiveInheritedTagsTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return DefaultInheritedBasicTagsTile<PawchivePost>();
+    return const DefaultInheritedBasicTagsTile<PawchivePost>();
   }
 }
 
