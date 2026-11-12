@@ -153,7 +153,7 @@ class JoyreactorSearchPage extends ConsumerStatefulWidget {
 }
 
 class _JoyreactorSearchPageState extends ConsumerState<JoyreactorSearchPage> {
-  late JoyreactorFeedType _feed = ref.read(joyreactorFeedTypeProvider);
+  late JoyreactorFeed _feed = ref.read(joyreactorFeedTypeProvider);
   ValueNotifier<PostGridController<JoyreactorPost>?>? _postController;
 
   @override
@@ -205,8 +205,8 @@ class JoyreactorFeedSelectorBar extends StatelessWidget {
     super.key,
   });
 
-  final JoyreactorFeedType selectedFeed;
-  final ValueChanged<JoyreactorFeedType> onFeedSelected;
+  final JoyreactorFeed selectedFeed;
+  final ValueChanged<JoyreactorFeed> onFeedSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -216,11 +216,11 @@ class JoyreactorFeedSelectorBar extends StatelessWidget {
       child: Row(
         children: [
           for (final entry in const [
-            (JoyreactorFeedType.all, 'All'),
-            (JoyreactorFeedType.good, 'Good'),
-            (JoyreactorFeedType.best, 'Best'),
-            (JoyreactorFeedType.newPosts, 'New'),
-            (JoyreactorFeedType.abyss, 'Abyss'),
+            (JoyreactorFeed.abyss, 'All'),
+            (JoyreactorFeed.good, 'Good'),
+            (JoyreactorFeed.best, 'Best'),
+            (JoyreactorFeed.latest, 'New'),
+            (JoyreactorFeed.abyss, 'Abyss'),
           ])
             Padding(
               padding: const EdgeInsets.only(right: 8),
