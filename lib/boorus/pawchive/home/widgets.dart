@@ -155,7 +155,7 @@ class PawchiveSearchPage extends ConsumerStatefulWidget {
 }
 
 class _PawchiveSearchPageState extends ConsumerState<PawchiveSearchPage> {
-  late PawchiveSortType _sort = ref.read(pawchiveSortTypeProvider);
+  late PawchiveFeed _sort = ref.read(pawchiveSortTypeProvider);
   ValueNotifier<PostGridController<PawchivePost>?>? _postController;
 
   @override
@@ -211,8 +211,8 @@ class PawchiveSortAndFilterBar extends StatelessWidget {
     super.key,
   });
 
-  final PawchiveSortType selectedSort;
-  final ValueChanged<PawchiveSortType> onSortSelected;
+  final PawchiveFeed selectedSort;
+  final ValueChanged<PawchiveFeed> onSortSelected;
   final ValueChanged<String> onServiceTap;
 
   @override
@@ -223,8 +223,8 @@ class PawchiveSortAndFilterBar extends StatelessWidget {
       child: Row(
         children: [
           for (final entry in const [
-            (PawchiveSortType.popular, 'Popular'),
-            (PawchiveSortType.recent, 'Recent'),
+            (PawchiveFeed.popularDay, 'Popular'),
+            (PawchiveFeed.recent, 'Recent'),
           ])
             Padding(
               padding: const EdgeInsets.only(right: 8),
