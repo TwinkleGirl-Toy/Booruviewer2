@@ -16,7 +16,7 @@ final joyreactorClientProvider =
 
       return JoyreactorClient(
         dio: dio,
-        baseUrl: config.url,
+        baseUrl: baseUrl,
       );
     });
 
@@ -27,6 +27,7 @@ final joyreactorDioProvider = Provider.family<Dio, BooruConfigAuth>((
   final ddosProtectionHandler = ref.watch(httpDdosProtectionBypassProvider);
   final loggerService = ref.watch(loggerProvider);
 
+  final baseUrl = JoyreactorClient.normalizeBaseUrl(config.url);
   final dio = newDio(
     options: DioOptions(
       ddosProtectionHandler: ddosProtectionHandler,
@@ -50,9 +51,9 @@ final joyreactorDioProvider = Provider.family<Dio, BooruConfigAuth>((
     ],
   );
 
-  dio.options.headers['Referer'] = config.url.endsWith('/')
-      ? config.url
-      : '${config.url}/';
+  dio.options.headers['Referer'] = baseUrl.endsWith('/')
+      ? baseUrl
+      : '${baseUrl}/';
 
   return dio;
 });
