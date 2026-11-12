@@ -127,7 +127,8 @@ jobs:
         run: dart run boorusama_cli:boorusama setup android-sdk --ci
 
       - name: Run booru_clients tests
-        run: flutter test packages/booru_clients/test/
+        working-directory: packages/booru_clients
+        run: flutter test test/
 
       - name: Analyze Flutter project
         run: flutter analyze
