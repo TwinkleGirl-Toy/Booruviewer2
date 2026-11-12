@@ -126,7 +126,7 @@ jobs:
         working-directory: packages/boorusama_cli
         run: dart run boorusama_cli:boorusama setup android-sdk --ci
 
-      - name: Run JoyReactor current-markup regression test
+      - name: Run JoyReactor markup and domain regression tests
         working-directory: packages/booru_clients
         run: flutter test test/joyreactor_current_markup_test.dart
 
