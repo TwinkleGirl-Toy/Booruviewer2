@@ -119,7 +119,7 @@ class JoyreactorDownloadFileUrlExtractor implements DownloadFileUrlExtractor {
   @override
   Future<DownloadUrlData?> getDownloadFileUrl({
     required Post post,
-    required String defaultQuality,
+    required String quality,
   }) async {
     if (post.isVideo && post.videoUrl.isNotEmpty) {
       return DownloadUrlData.urlOnly(post.videoUrl);
