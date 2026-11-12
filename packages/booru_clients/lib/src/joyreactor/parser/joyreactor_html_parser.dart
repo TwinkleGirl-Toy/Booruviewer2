@@ -10,7 +10,7 @@ import '../types/types.dart';
 
 class JoyreactorHtmlParser {
   const JoyreactorHtmlParser({
-    this.baseUrl = 'https://joyreactor.cc',
+    this.baseUrl = 'https://joyreactor.com',
   });
 
   final String baseUrl;
@@ -49,7 +49,7 @@ class JoyreactorHtmlParser {
 
     // JoyReactor wraps posts in `.postContainer` or `.uhead` + `.ufoot` blocks.
     final postElements = document.querySelectorAll(
-      'div.postContainer, div.article.post-normal, div[id^="postContainer"]',
+      'div.postContainer, div.article.post-normal, div[id^="postContainer"], div.content',
     );
 
     if (postElements.isNotEmpty) {
@@ -313,7 +313,7 @@ class JoyreactorHtmlParser {
     final seenNames = <String>{};
 
     // 1. Primary DOM `.taglist a` elements
-    final tagAnchors = element.querySelectorAll('.taglist a, h2.taglist a');
+    final tagAnchors = element.querySelectorAll('.taglist a, h2.taglist a, .post-tags a');
     for (final a in tagAnchors) {
       final rawText = a.text.trim().isNotEmpty
           ? a.text
@@ -375,17 +375,28 @@ class JoyreactorHtmlParser {
       }
     }
 
-    final avatarImg = element.querySelector('.uhead_nick img.avatar, .uhead img');
+    final avatarImg = element.querySelector(
+      '.uhead_nick img.avatar, .uhead img, img[src*="/avatar/user/"]',
+    );
     if (avatarImg != null) {
       final src = avatarImg.attributes['src'];
       if (src != null && src.isNotEmpty) {
         avatarUrl = normalizeUrl(src);
       }
       final idClass = avatarImg.className;
-      final idMatch = RegExp(r'user_(\d+)').firstMatch(idClass);
+      final idMatch = RegExp(r'user_(\d+)').firstMatch(idClass) ??
+          RegExp(r'/avatar/user/(\d+)').firstMatch(src);
       if (idMatch != null) {
         userId = int.tryParse(idMatch.group(1)!);
       }
+    }
+
+    if (name == null || name.isEmpty) {
+      final avatarAlt = element
+          .querySelector('img[src*="/avatar/user/"][alt], img.avatar[alt]')
+          ?.attributes['alt'];
+      final fallbackName = unescapeHtml(avatarAlt ?? '').trim();
+      if (fallbackName.isNotEmpty) name = fallbackName;
     }
 
     if ((name == null || name.isEmpty) && jsonLd != null) {
@@ -476,7 +487,7 @@ class JoyreactorHtmlParser {
     String? title;
     String? description;
 
-    final postContent = element.querySelector('.post_content');
+    final postContent = element.querySelector('.post-content, .post_content');
     if (postContent != null) {
       final h3 = postContent.querySelector('h3, .post_title');
       if (h3 != null) {
@@ -512,30 +523,71 @@ class JoyreactorHtmlParser {
   }
 
   List<JoyreactorMediaDto> _extractMediaAttachments(dom.Element element) {
-    final postContent = element.querySelector('.post_content') ?? element;
+    final postContent =
+        element.querySelector('.post-content, .post_content') ?? element;
     final imageContainers = postContent.querySelectorAll('div.image');
 
     final attachments = <JoyreactorMediaDto>[];
     final seenUrls = <String>{};
 
-    if (imageContainers.isNotEmpty) {
-      for (final container in imageContainers) {
-        final media = _parseSingleMediaContainer(
-          container,
-          index: attachments.length,
-        );
-        if (media != null && seenUrls.add(media.originalUrl)) {
-          attachments.add(media);
-        }
-      }
-    } else {
-      // Fallback: if images/videos are placed directly inside `.post_content` without `div.image`
-      final media = _parseSingleMediaContainer(
-        postContent,
-        index: 0,
-      );
+    void addMedia(JoyreactorMediaDto? media) {
       if (media != null && seenUrls.add(media.originalUrl)) {
         attachments.add(media);
+      }
+    }
+
+    if (imageContainers.isNotEmpty) {
+      // Legacy layout: each attachment is wrapped in a div.image.
+      for (final container in imageContainers) {
+        addMedia(
+          _parseSingleMediaContainer(
+            container,
+            index: attachments.length,
+          ),
+        );
+      }
+    } else {
+      // Current layout: media may be placed directly inside .post-content.
+      for (final video in postContent.querySelectorAll('video')) {
+        addMedia(
+          _parseVideoElement(
+            container: video.parent ?? postContent,
+            videoElem: video,
+            index: attachments.length,
+          ),
+        );
+      }
+
+      for (final img in postContent.querySelectorAll('img')) {
+        final rawSrc =
+            (img.attributes['src'] ?? img.attributes['data-src'] ?? '').trim();
+        if (rawSrc.isEmpty || rawSrc.contains('/avatar/')) continue;
+        if (img.classes.contains('avatar')) continue;
+        addMedia(
+          _parseImageElement(
+            container: img.parent ?? postContent,
+            imgElem: img,
+            index: attachments.length,
+          ),
+        );
+      }
+
+      for (final iframe in postContent.querySelectorAll('iframe')) {
+        final rawSrc = iframe.attributes['src']?.trim() ?? '';
+        if (rawSrc.isEmpty) continue;
+        final embedUrl = normalizeUrl(rawSrc);
+        addMedia(
+          JoyreactorMediaDto(
+            index: attachments.length,
+            thumbnailUrl: embedUrl,
+            sampleUrl: embedUrl,
+            originalUrl: embedUrl,
+            type: JoyreactorMediaType.embed,
+            width: int.tryParse(iframe.attributes['width'] ?? ''),
+            height: int.tryParse(iframe.attributes['height'] ?? ''),
+            format: 'embed',
+          ),
+        );
       }
     }
 
@@ -702,9 +754,15 @@ class JoyreactorHtmlParser {
 
     // Check if wrapped in `<a class="prettyPhotoLink" href="...">` for full-res image
     String? fullHref;
-    final parentAnchor = container.querySelector(
-      'a.prettyPhotoLink, a[href*="/post/full/"], a[rel^="prettyPhoto"]',
-    );
+    final isFullImageLink = container.localName == 'a' &&
+        (container.classes.contains('prettyPhotoLink') ||
+            (container.attributes['href'] ?? '').contains('/post/full/') ||
+            (container.attributes['rel'] ?? '').startsWith('prettyPhoto'));
+    final parentAnchor = isFullImageLink
+        ? container
+        : container.querySelector(
+            'a.prettyPhotoLink, a[href*="/post/full/"], a[rel^="prettyPhoto"]',
+          );
     if (parentAnchor != null) {
       final href = parentAnchor.attributes['href']?.trim() ?? '';
       if (href.isNotEmpty) {
