@@ -47,12 +47,15 @@ class JoyreactorRepository extends BooruRepositoryDefault {
 
   @override
   PostLinkGenerator<Post> postLinkGenerator(BooruConfigAuth config) {
-    return JoyreactorPostLinkGenerator(baseUrl: config.url);
+    return JoyreactorPostLinkGenerator(
+      baseUrl: JoyreactorClient.normalizeBaseUrl(config.url),
+    );
   }
 
   @override
   Map<String, String> extraHttpHeaders(BooruConfigAuth config) {
-    final referer = config.url.endsWith('/') ? config.url : '${config.url}/';
+    final baseUrl = JoyreactorClient.normalizeBaseUrl(config.url);
+    final referer = baseUrl.endsWith('/') ? baseUrl : '${baseUrl}/';
     return {
       'Referer': referer,
     };
